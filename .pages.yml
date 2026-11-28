@@ -1,7 +1,79 @@
 
+media:
+  input: assets
+  output: /assets
+
 content:
   - name: website
     label: فایل اصلی سایت
     type: file
     path: index.html
     format: code
+
+  - name: settings
+    label: اطلاعات و مشخصات آزمایشگاه
+    type: file
+    path: data/site.json
+    format: json
+    fields:
+      - name: name_fa
+        label: نام فارسی آزمایشگاه
+        type: string
+      - name: name_en
+        label: نام انگلیسی آزمایشگاه
+        type: string
+      - name: phone
+        label: شماره تماس
+        type: string
+      - name: email
+        label: ایمیل
+        type: string
+      - name: instagram
+        label: اینستاگرام
+        type: string
+      - name: about_fa
+        label: معرفی فارسی
+        type: rich-text
+      - name: about_en
+        label: معرفی انگلیسی
+        type: rich-text
+
+  - name: articles
+    label: مدیریت مقالات
+    type: collection
+    path: content/articles
+    filename: "{primary}.json"
+    format: json
+    fields:
+      - name: title
+        label: عنوان مقاله
+        type: string
+      - name: date
+        label: تاریخ
+        type: date
+      - name: body
+        label: متن مقاله
+        type: rich-text
+      - name: published
+        label: انتشار
+        type: boolean
+
+  - name: services
+    label: مدیریت خدمات پژوهشی
+    type: collection
+    path: content/services
+    filename: "{primary}.json"
+    format: json
+    fields:
+      - name: title
+        label: عنوان خدمت
+        type: string
+      - name: description
+        label: توضیحات خدمت
+        type: rich-text
+      - name: published
+        label: انتشار
+        type: boolean
+
+settings:
+  content: true
