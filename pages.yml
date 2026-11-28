@@ -1,0 +1,46 @@
+
+media:
+  input: assets
+  output: /assets
+
+content:
+  - name: pages
+    label: صفحات سایت
+    path: content/pages
+    type: collection
+    fields:
+      - name: title
+        label: عنوان صفحه
+        type: string
+      - name: body
+        label: متن صفحه
+        type: rich-text
+
+  - name: articles
+    label: مقالات
+    path: content/articles
+    type: collection
+    filename: "{primary}.md"
+    fields:
+      - name: title
+        label: عنوان مقاله
+        type: string
+      - name: date
+        label: تاریخ انتشار
+        type: date
+      - name: body
+        label: متن مقاله
+        type: rich-text
+
+  - name: services
+    label: خدمات پژوهشی
+    path: content/services
+    type: collection
+    filename: "{primary}.md"
+    fields:
+      - name: title
+        label: نام خدمت
+        type: string
+      - name: body
+        label: توضیحات
+        type: rich-text
