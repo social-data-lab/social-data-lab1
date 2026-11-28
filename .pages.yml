@@ -1,0 +1,7 @@
+
+content:
+  - name: website
+    label: فایل اصلی سایت
+    type: file
+    path: index.html
+    format: code
