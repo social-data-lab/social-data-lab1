@@ -68,14 +68,134 @@ body.en{direction:ltr}body.en .brand,body.en .nav,body.en .nav-actions,body.en .
 </div></div></section>
 </main>
 <footer><div class="container footer-row"><div><div class="footer-brand" data-fa="آزمایشگاه مستقل تحلیل داده‌های اجتماعی" data-en="Independent Social Data Analytics Lab">آزمایشگاه مستقل تحلیل داده‌های اجتماعی</div><small data-fa="از داده تا دانش، از دانش تا تصمیم" data-en="From data to knowledge, from knowledge to decisions">از داده تا دانش، از دانش تا تصمیم</small></div><small>© <span id="year"></span> <span data-fa="تمامی حقوق محفوظ است." data-en="All rights reserved.">تمامی حقوق محفوظ است.</span></small></div></footer>
+
 <script>
-const body=document.body, langBtn=document.getElementById('langBtn');
-let current='fa';
-function setLang(lang){current=lang;body.classList.toggle('en',lang==='en');body.dir=lang==='fa'?'rtl':'ltr';document.documentElement.lang=lang;document.documentElement.dir=lang==='fa'?'rtl':'ltr';document.querySelectorAll('[data-fa][data-en]').forEach(el=>{el.innerHTML=el.dataset[lang]});langBtn.textContent=lang==='fa'?'EN':'فا';document.querySelectorAll('input,textarea').forEach(el=>{if(el.id==='name')el.placeholder=lang==='fa'?'نام شما':'Your name';if(el.id==='reply')el.placeholder=lang==='fa'?'name@example.com':'name@example.com';if(el.id==='message')el.placeholder=lang==='fa'?'درباره نیاز یا پرسش خود بنویسید...':'Describe your needs or question...'});}
-langBtn.addEventListener('click',()=>setLang(current==='fa'?'en':'fa'));
-document.getElementById('menuBtn').addEventListener('click',()=>document.getElementById('navlinks').classList.toggle('open'));
-document.querySelectorAll('#navlinks a').forEach(a=>a.addEventListener('click',()=>document.getElementById('navlinks').classList.remove('open')));
-document.getElementById('year').textContent=new Date().getFullYear();
-document.getElementById('contactForm').addEventListener('submit',e=>{e.preventDefault();const name=document.getElementById('name').value,reply=document.getElementById('reply').value,topic=document.getElementById('topic').value,message=document.getElementById('message').value;const subject=encodeURIComponent('درخواست همکاری - '+topic);const bodyText=encodeURIComponent('نام: '+name+'\nراه تماس: '+reply+'\nموضوع: '+topic+'\nشرح: '+message);window.location.href='mailto:research040@gmail.com?subject='+subject+'&body='+bodyText;});
+const body = document.body;
+const langBtn = document.getElementById('langBtn');
+let current = 'fa';
+let labEmail = 'research040@gmail.com';
+
+function setLang(lang) {
+  current = lang;
+  body.classList.toggle('en', lang === 'en');
+  body.dir = lang === 'fa' ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+
+  document.querySelectorAll('[data-fa][data-en]').forEach(el => {
+    el.innerHTML = el.dataset[lang];
+  });
+
+  langBtn.textContent = lang === 'fa' ? 'EN' : 'فا';
+
+  document.querySelectorAll('input,textarea').forEach(el => {
+    if (el.id === 'name') el.placeholder =
+      lang === 'fa' ? 'نام شما' : 'Your name';
+    if (el.id === 'reply') el.placeholder = 'name@example.com';
+    if (el.id === 'message') el.placeholder =
+      lang === 'fa' ? 'درباره نیاز یا پرسش خود بنویسید...' :
+      'Describe your needs or question...';
+  });
+}
+
+langBtn.addEventListener('click', () =>
+  setLang(current === 'fa' ? 'en' : 'fa')
+);
+
+document.getElementById('menuBtn').addEventListener('click', () =>
+  document.getElementById('navlinks').classList.toggle('open')
+);
+
+document.querySelectorAll('#navlinks a').forEach(a =>
+  a.addEventListener('click', () =>
+    document.getElementById('navlinks').classList.remove('open')
+  )
+);
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+async function loadLabSettings() {
+  try {
+    const response = await fetch('/data/site.json');
+    if (!response.ok) throw new Error('Settings file not found');
+
+    const data = await response.json();
+
+    if (data.name_fa) {
+      document.title = data.name_fa;
+      const footerName = document.querySelector('.footer-brand');
+      if (footerName) {
+        footerName.dataset.fa = data.name_fa;
+        footerName.dataset.en = data.name_en || data.name_fa;
+      }
+    }
+
+    if (data.name_en) {
+      document.title = current === 'en' ? data.name_en : document.title;
+    }
+
+    const contactLines = document.querySelectorAll('.contact-line');
+
+    if (data.email && contactLines[0]) {
+      const link = contactLines[0].querySelector('a');
+      if (link) {
+        link.textContent = data.email;
+        link.href = 'mailto:' + data.email;
+      }
+      labEmail = data.email;
+    }
+
+    if (data.phone && contactLines[1]) {
+      const link = contactLines[1].querySelector('a');
+      if (link) {
+        link.textContent = data.phone;
+        link.href = 'tel:' + data.phone.replace(/[^\d+]/g, '');
+      }
+    }
+
+    if (data.instagram && contactLines[2]) {
+      const link = contactLines[2].querySelector('a');
+      if (link) {
+        const username = data.instagram.replace(/^@/, '');
+        link.textContent = '@' + username;
+        link.href = 'https://www.instagram.com/' + username + '/';
+      }
+    }
+
+    if (data.about_fa) {
+      const about = document.querySelector('.about-copy p');
+      if (about) {
+        about.dataset.fa = data.about_fa;
+        about.dataset.en = data.about_en || data.about_fa;
+      }
+    }
+
+    setLang(current);
+
+  } catch (error) {
+    console.log('Lab settings could not be loaded:', error);
+  }
+}
+
+loadLabSettings();
+
+document.getElementById('contactForm').addEventListener('submit', e => {
+  e.preventDefault();
+
+  const name = document.getElementById('name').value;
+  const reply = document.getElementById('reply').value;
+  const topic = document.getElementById('topic').value;
+  const message = document.getElementById('message').value;
+
+  const subject = encodeURIComponent('درخواست همکاری - ' + topic);
+  const bodyText = encodeURIComponent(
+    'نام: ' + name +
+    '\nراه تماس: ' + reply +
+    '\nموضوع: ' + topic +
+    '\nشرح: ' + message
+  );
+
+  window.location.href =
+    'mailto:' + labEmail + '?subject=' + subject + '&body=' + bodyText;
+});
 </script>
-</body></html>
